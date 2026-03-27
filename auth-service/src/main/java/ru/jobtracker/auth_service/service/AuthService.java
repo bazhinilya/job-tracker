@@ -23,7 +23,17 @@ public class AuthService {
   private final TokenService tokenService;
 
   public RegisterResponse register(RegisterRequest request) {
-    return null;
+    if (userRepository.existsByUsername(request.username())) {
+      throw new RuntimeException("Username already exists");
+    }
+    
+    String encodedPassword = passwordEncoder.encode(request.password());
+    User user = new User(request.username(), encodedPassword, request.email());
+    
+    User createdUser = userRepository.save(user);
+    log.info("User '{}' was created", createdUser.getUsername());
+    
+    return new RegisterResponse(createdUser.getUsername(), createdUser.getEmail());
   }
 
   public LoginResponse login(LoginRequest request) {
