@@ -4,6 +4,16 @@ server:
 spring:
   application:
     name: auth-service
+
+  security:
+    oauth2:
+      resourceserver:
+        opaquetoken:
+          # Auth Server проверяет сам себя
+          introspection-uri: http://localhost:9000/oauth2/introspect
+          client-id: auth-server
+          client-secret: ${AUTH_SERVER_SECRET:secret}
+
   datasource:
     url: jdbc:postgresql://localhost:5432/auth_db
     username: postgres

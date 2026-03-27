@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+  private final CustomOpaqueTokenIntrospector tokenIntrospector;
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http
@@ -32,6 +34,7 @@ public class SecurityConfig {
                 "/actuator/**")
             .permitAll()
             .anyRequest().authenticated())
+        .oauth2ResourceServer(oauth2 -> oauth2.opaqueToken(opaque -> opaque.introspector(tokenIntrospector)))
         .build();
   }
 

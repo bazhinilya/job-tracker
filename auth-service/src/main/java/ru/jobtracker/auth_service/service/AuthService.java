@@ -1,5 +1,7 @@
 package ru.jobtracker.auth_service.service;
 
+import java.util.Map;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +28,13 @@ public class AuthService {
     if (userRepository.existsByUsername(request.username())) {
       throw new RuntimeException("Username already exists");
     }
-    
+
     String encodedPassword = passwordEncoder.encode(request.password());
     User user = new User(request.username(), encodedPassword, request.email());
-    
+
     User createdUser = userRepository.save(user);
     log.info("User '{}' was created", createdUser.getUsername());
-    
+
     return new RegisterResponse(createdUser.getUsername(), createdUser.getEmail());
   }
 
@@ -47,9 +49,20 @@ public class AuthService {
     TokenInfo tokenInfo = tokenService.createToken(user);
 
     return new LoginResponse(
-        tokenInfo.token(),
-        tokenInfo.expiresAt() - tokenInfo.createdAt(),
+        tokenInfo.getToken(),
+        tokenInfo.getExpiresAt() - tokenInfo.getCreatedAt(),
         "Bearer");
   }
 
+  public Map<String, Object> logout(String token) {
+    if (token == null || !token.startsWith("Bearer ")) {
+      throw new RuntimeException("Token is not Bearer");
+    }
+    String extractedToken = token.substring(7);
+    boolean isRevoked = tokenService.revokeToken(extractedToken);
+    if (!isRevoked) {
+      throw new RuntimeException("Token is not revoked");
+    }
+    return Map.of("message", "Logged out");
+  }
 }

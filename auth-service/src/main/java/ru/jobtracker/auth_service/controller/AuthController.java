@@ -1,9 +1,12 @@
 package ru.jobtracker.auth_service.controller;
 
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,5 +36,11 @@ public class AuthController {
   @Operation(summary = "Регистрация нового пользователя")
   public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+  }
+
+  @PostMapping("/logout")
+  @Operation(summary = "Выйти из системы")
+  public ResponseEntity<Map<String, Object>> logout(@RequestHeader("Authorization") String token) {
+    return ResponseEntity.ok(authService.logout(token));
   }
 }
