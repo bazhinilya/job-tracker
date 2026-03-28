@@ -9,7 +9,7 @@ import ru.jobtracker.auth_service.model.TokenInfo;
 
 @Service
 @RequiredArgsConstructor
-public class IntrospectionService {
+public class Oath2Service {
 
   private final TokenService tokenService;
 
