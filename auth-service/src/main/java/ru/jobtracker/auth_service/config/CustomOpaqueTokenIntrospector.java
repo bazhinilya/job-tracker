@@ -26,7 +26,7 @@ public class CustomOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
   public OAuth2AuthenticatedPrincipal introspect(String token) {
     TokenInfo tokenInfo = tokenService.introspectToken(token);
 
-    if (tokenInfo == null) {
+    if (tokenInfo == null || !tokenInfo.isActive()) {
       log.warn("Invalid token: {}", maskToken(token));
       throw new RuntimeException("Invalid token");
     }
