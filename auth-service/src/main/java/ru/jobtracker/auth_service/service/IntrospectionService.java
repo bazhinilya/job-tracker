@@ -1,5 +1,6 @@
 package ru.jobtracker.auth_service.service;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -9,11 +10,18 @@ import ru.jobtracker.auth_service.model.TokenInfo;
 
 @Service
 @RequiredArgsConstructor
-public class Oath2Service {
+public class IntrospectionService {
 
   private final TokenService tokenService;
 
-  public IntrospectResponse introspect(String token, String clientId, String clientSecret) {
+  public IntrospectResponse introspect(String token, UserDetails client) {
+    boolean hasIntrospectScope = client.getAuthorities().stream()
+        .anyMatch(a -> a.getAuthority().equals("SCOPE_introspect"));
+
+    if (!hasIntrospectScope) {
+      throw new RuntimeException("Introspect is denied");
+    }
+
     if (!StringUtils.hasText(token)) {
       throw new RuntimeException("Token is not Bearer");
     }
